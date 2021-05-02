@@ -1,11 +1,16 @@
 /*	Author: Rishab Dudhia
  *  Partner(s) Name: 
  *	Lab Section: 022
- *	Assignment: Lab #7  Exercise #4
+ *	Assignment: Lab #7  Exercise #2
  *	Exercise Description: [optional - include for your own benefit]
- *	Ligths turn on in eigths of light to photoresistor
+ *	Same as exercise 1 but with photoresistor instead of potentiometer
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
+ *
+ *	Youtube Link: https://www.youtube.com/watch?v=3A-z3MrlQhI
+ *
+ *	MAX = 0x0C0 => In the video, I found when the lights were displaying the largest binary value with the bottom lights being 
+ *	the most significant bits
  */
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -76,86 +81,24 @@ void ADC_init() {
 	//       a new conversion will trigger whenever the previous conversion completes
 }
 
-enum smstates {smstart, on, off} state;
-unsigned short MAX; 
-
-void Tick() {
-	unsigned short tempADC = ADC;
-	MAX = (0x0C0) / 2; 
-	switch (state) {
-		case smstart:
-			state = off;
-			break;
-		case on:
-			if (tempADC >= MAX)
-				state = on;
-			else 
-				state = off;
-			break;
-		case off:
-			if (tempADC >= MAX)
-				state = on;
-			else
-				state = off;
-			break;
-		default:
-			state = off;
-			break;
-	}
-
-	switch (state) {
-		case smstart:
-			PORTB = 0x00;
-			break;
-		case on:
-			PORTB = 0x01;
-			break;
-		case off: 
-			PORTB = 0x00;
-			break;
-		default:
-			break;
-	}
-}
-
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRB = 0xFF; PORTB = 0x00;
-    //DDRD = 0x03; PORTD = 0x00;
+    DDRD = 0x03; PORTD = 0x00;
     DDRA = 0x00; PORTA = 0xFF;
     unsigned short tempADC;
-    unsigned short tempVar;
-    unsigned short sum;
-    unsigned char tempB;
-    //unsigned char temp;
+    unsigned char temp;
     ADC_init();
-    //TimerSet(100);
-    //TimerOn();
-    state = smstart;
     /* Insert your solution below */
     while (1) {
-		tempADC = ADC;
-		MAX = 0x0C0;
-		tempVar = MAX / 8;
-		sum = tempVar;
-		//tempB = 0x00;
-		
-		if (tempADC < tempVar) 
-			PORTB = 0x01;
-		else if (tempADC < (sum + (1 *  tempVar)))
-			PORTB = 0x03;
-		else if (tempADC < (sum + (2 * tempVar)))
-			PORTB = 0x07;
-		else if (tempADC < (sum + (3 * tempVar)))
-			PORTB = 0x0F;
-		else if (tempADC < (sum + (4 * tempVar)))
-			PORTB = 0x1F;
-		else if (tempADC < (sum + (5 * tempVar)))
-			PORTB = 0x3F;
-		else if (tempADC < (sum + (6 * tempVar)))
-			PORTB = 0x7F;
-		else 
-			PORTB = 0xFF;
+	temp = 0x00;
+	tempADC = ADC;
+	temp = (char)tempADC;
+	PORTB = temp;
+	temp = 0x00;
+	temp = 0x300 & tempADC;
+	temp = temp >> 8;
+        PORTD = temp;	
     }
     return 1;
 }

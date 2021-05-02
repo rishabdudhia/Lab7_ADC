@@ -1,11 +1,13 @@
 /*	Author: Rishab Dudhia
  *  Partner(s) Name: 
  *	Lab Section: 022
- *	Assignment: Lab #7  Exercise #4
+ *	Assignment: Lab #7  Exercise #3
  *	Exercise Description: [optional - include for your own benefit]
- *	Ligths turn on in eigths of light to photoresistor
+ *	LED on if ADC is >= MAX / 2
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
+ *
+ *	Youtube link: https://www.youtube.com/watch?v=AgdpuM-vhYU
  */
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -123,39 +125,17 @@ int main(void) {
     DDRB = 0xFF; PORTB = 0x00;
     //DDRD = 0x03; PORTD = 0x00;
     DDRA = 0x00; PORTA = 0xFF;
-    unsigned short tempADC;
-    unsigned short tempVar;
-    unsigned short sum;
-    unsigned char tempB;
+    //unsigned short tempADC;
     //unsigned char temp;
     ADC_init();
-    //TimerSet(100);
-    //TimerOn();
+    TimerSet(100);
+    TimerOn();
     state = smstart;
     /* Insert your solution below */
     while (1) {
-		tempADC = ADC;
-		MAX = 0x0C0;
-		tempVar = MAX / 8;
-		sum = tempVar;
-		//tempB = 0x00;
-		
-		if (tempADC < tempVar) 
-			PORTB = 0x01;
-		else if (tempADC < (sum + (1 *  tempVar)))
-			PORTB = 0x03;
-		else if (tempADC < (sum + (2 * tempVar)))
-			PORTB = 0x07;
-		else if (tempADC < (sum + (3 * tempVar)))
-			PORTB = 0x0F;
-		else if (tempADC < (sum + (4 * tempVar)))
-			PORTB = 0x1F;
-		else if (tempADC < (sum + (5 * tempVar)))
-			PORTB = 0x3F;
-		else if (tempADC < (sum + (6 * tempVar)))
-			PORTB = 0x7F;
-		else 
-			PORTB = 0xFF;
+		Tick();
+		while (!TimerFlag);
+		TimerFlag = 0;
     }
     return 1;
 }
